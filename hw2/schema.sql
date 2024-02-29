@@ -1,17 +1,17 @@
 DROP TABLE IF EXISTS user;
-DROP TABLE IF EXISTS post;
 
 CREATE TABLE user (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  username TEXT UNIQUE NOT NULL,
-  password TEXT NOT NULL
+    name TEXT NOT NULL,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    points INTEGER NOT NULL
 );
 
-CREATE TABLE post (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  author_id INTEGER NOT NULL,
-  created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  title TEXT NOT NULL,
-  body TEXT NOT NULL,
-  FOREIGN KEY (author_id) REFERENCES user (id)
-);
+INSERT INTO user (name, id, points)
+VALUES
+("Steve Smith", 211, 80),
+("Jian Wong", 122, 92),
+("Chris Peterson", 213, 91),
+("Sai Patel", 524, 94),
+("Andrew Whitehead", 425, 99),
+("Lynn Roberts", 626, 90),
+("Robert Sanders", 287, 75);
