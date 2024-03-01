@@ -6,8 +6,7 @@ CREATE TABLE user (
     points INTEGER NOT NULL
 );
 
-INSERT INTO user (name, id, points)
-VALUES
+INSERT INTO user (name, id, points) VALUES
 ("Steve Smith", 211, 80),
 ("Jian Wong", 122, 92),
 ("Chris Peterson", 213, 91),

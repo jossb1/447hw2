@@ -1,4 +1,5 @@
-import sqlite3, click
+import click
+import sqlite3
 from flask import current_app, g
 
 
@@ -13,7 +14,7 @@ def get_db():
     return g.db
 
 
-def close_db(e=None):
+def close_db(_):
     db = g.pop('db', None)
 
     if db is not None:
