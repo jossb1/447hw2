@@ -15,13 +15,14 @@
         </ul>
         <ul>
           <li><a href="{{ url_for('site.index') }}">Home</a></li>
+          <li><a href="{{ url_for('site.create') }}">New user</a></li>
         </ul>
       </nav>
     </header>
     <main class="container">
       {% block header %}{% endblock %}
       {% for message in get_flashed_messages() %}
-        <p>{{ message }}</p>
+        <p style="color: var(--pico-primary)">{{ message }}</p>
       {% endfor %}
       {% block content %}{% endblock %}
     </main>

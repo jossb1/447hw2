@@ -1,14 +1,41 @@
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for
 )
-from werkzeug.exceptions import abort
 from hw2.db import get_db
 
 bp = Blueprint('site', __name__)
 
 
-@bp.route('/')
+@bp.route('/', methods=('GET', 'POST'))
 def index():
+    if request.method == 'POST':
+        query = request.form['query']
+
+        if query:
+            int_query = None
+            try:
+                float_query = float(query)
+                if float_query.is_integer() and float_query >= 0:
+                    int_query = int(float_query)
+            except ValueError:
+                pass
+
+            db = get_db()
+            if int_query is None:
+                users = db.execute(
+                    'SELECT name, id, points FROM user'
+                    " WHERE name LIKE ? OR name LIKE ?"
+                    " ORDER BY name", (f"{query}%", f"% {query}%")
+                ).fetchall()
+            else:
+                users = db.execute(
+                    'SELECT name, id, points FROM user'
+                    " WHERE name LIKE ? OR name LIKE ?"
+                    " OR points = ? OR id = ?",
+                    (f"{query}%", f"% {query}%", int_query, int_query)
+                ).fetchall()
+            return render_template('site/index.html', users=users, query=query)
+
     db = get_db()
     users = db.execute(
         'SELECT name, id, points FROM user'
@@ -19,21 +46,30 @@ def index():
 @bp.route('/create', methods=('GET', 'POST'))
 def create():
     if request.method == 'POST':
-        title = request.form['title']
-        body = request.form['body']
+        name = request.form['name']
+        points = request.form['points']
         error = None
 
-        if not title:
-            error = 'Title is required.'
+        if not name or not points:
+            error = 'Both fields are required.'
+
+        try:
+            points = float(points)
+            if points.is_integer() and points >= 0:
+                points = int(points)
+            else:
+                error = 'Points must be a non-negative whole number'
+        except ValueError:
+            error = 'Points must be a non-negative whole number'
 
         if error is not None:
             flash(error)
         else:
             db = get_db()
             db.execute(
-                'INSERT INTO post (title, body, author_id)'
-                ' VALUES (?, ?, ?)',
-                (title, body, g.user['id'])
+                'INSERT INTO user (name, points)'
+                ' VALUES (?, ?)',
+                (name, points)
             )
             db.commit()
             return redirect(url_for('site.index'))
@@ -43,10 +79,8 @@ def create():
 
 def get_user(id):
     user = get_db().execute(
-        'SELECT p.id, title, body, created, author_id, username'
-        ' FROM post p JOIN user u ON p.author_id = u.id'
-        ' WHERE p.id = ?',
-        (id,)
+        'SELECT name, id, points FROM user'
+        ' WHERE id = ?', (id,)
     ).fetchone()
 
     return user
@@ -57,21 +91,29 @@ def update(id):
     user = get_user(id)
 
     if request.method == 'POST':
-        title = request.form['title']
-        body = request.form['body']
+        name = request.form['name']
+        points = request.form['points']
         error = None
 
-        if not title:
-            error = 'Title is required.'
+        if not name or not points:
+            error = 'Both fields are required.'
+
+        try:
+            points = float(points)
+            if points.is_integer() and points >= 0:
+                points = int(points)
+            else:
+                error = 'Points must be a non-negative whole number'
+        except ValueError:
+            error = 'Points must be a non-negative whole number'
 
         if error is not None:
             flash(error)
         else:
             db = get_db()
             db.execute(
-                'UPDATE post SET title = ?, body = ?'
-                ' WHERE id = ?',
-                (title, body, id)
+                'UPDATE user SET name = ?, points = ?'
+                ' WHERE id = ?', (name, points, id)
             )
             db.commit()
             return redirect(url_for('site.index'))
@@ -81,8 +123,7 @@ def update(id):
 
 @bp.route('/<int:id>/delete', methods=('POST',))
 def delete(id):
-    get_user(id)
     db = get_db()
-    db.execute('DELETE FROM post WHERE id = ?', (id,))
+    db.execute('DELETE FROM user WHERE id = ?', (id,))
     db.commit()
     return redirect(url_for('site.index'))

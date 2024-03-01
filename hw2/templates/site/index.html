@@ -5,11 +5,16 @@
 {% endblock %}
 
 {% block content %}
+  <form role="search" method="post">
+    <input name="query" value="{{ query or '' }}" type="search" />
+    <input type="submit" value="Search" />
+  </form>
   <table>
     <thead>
       <th scope="col">Name</th>
       <th scope="col">ID</th>
       <th scope="col">Points</th>
+      <th scope="col"></th>
     </thead>
     <tbody>
     {% for user in users %}
@@ -17,6 +22,9 @@
         <td>{{ user['name'] }}</td>
         <td>{{ user['id'] }}</td>
         <td>{{ user['points'] }}</td>
+        <td><a href="{{ url_for('site.update', id=user['id']) }}">
+          <button>Edit</button>
+        </a></td>
       </tr>
     {% endfor %}
     </tbody>

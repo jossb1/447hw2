@@ -6,10 +6,16 @@
 
 {% block content %}
   <form method="post">
-    <label for="title">Title</label>
-    <input name="title" id="title" value="{{ request.form['title'] }}" required>
-    <label for="body">Body</label>
-    <textarea name="body" id="body">{{ request.form['body'] }}</textarea>
-    <input type="submit" value="Save">
+    <fieldset class="grid">
+      <label>
+        Name
+        <input name="name" value="{{ request.form['name'] }}" required>
+      </label>
+      <label>
+        Points
+        <input type="number" name="points" value="{{ request.form['points'] }}" required>
+      </label>
+    </fieldset>
+    <input type="submit" value="Add user">
   </form>
 {% endblock %}
